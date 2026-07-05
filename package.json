@@ -1,0 +1,28 @@
+{
+  "name": "wasm-demo",
+  "version": "1.0.0",
+  "description": "WebAssembly demo con AssemblyScript y TypeScript/Node",
+  "main": "index.js",
+  "scripts": {
+    "build:wasm": "asc assembly/index.ts --target release",
+    "build:ts": "tsc",
+    "start": "ts-node src/main.ts",
+    "demo": "npm run build:wasm && npm run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "assemblyscript": "^0.28.19",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
+}
