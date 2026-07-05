@@ -1,49 +1,49 @@
 # WebAssembly Demo — TypeScript + Node.js
 
-Implementación práctica de WebAssembly usando **AssemblyScript** (TypeScript → .wasm) y un runner en **TypeScript/Node**.
+Practical implementation of WebAssembly using **AssemblyScript** (TypeScript → .wasm) and a runner in **TypeScript/Node**.
 
-## Estructura
+## Structure
 
 ```
 wasm-demo/
 ├── assembly/
-│   └── index.ts        # Código fuente AssemblyScript → compilado a .wasm
+│   └── index.ts        # AssemblyScript source → compiled to .wasm
 ├── build/
-│   └── release.wasm    # Módulo WebAssembly compilado
+│   └── release.wasm    # Compiled WebAssembly module
 ├── src/
-│   └── main.ts         # Runner TypeScript que carga y ejecuta el módulo
+│   └── main.ts         # TypeScript runner that loads and executes the module
 ├── tsconfig.json
 └── package.json
 ```
 
-## Funciones implementadas en WASM
+## Functions implemented in WASM
 
-| Función | Descripción |
+| Function | Description |
 |---|---|
-| `factorial(n)` | Factorial iterativo con i64 |
-| `fibonacci(n)` | Fibonacci iterativo optimizado |
-| `esPrimo(n)` | Verificación de primalidad O(√n) |
-| `sumaArray(ptr, len)` | Suma de array vía memoria lineal |
-| `potencia(base, exp)` | Potencia entera |
+| `factorial(n)` | Iterative factorial using i64 |
+| `fibonacci(n)` | Optimized iterative Fibonacci |
+| `isPrime(n)` | O(√n) primality check |
+| `sumArray(ptr, len)` | Array sum via linear memory |
+| `power(base, exp)` | Integer power |
 
-## Cómo ejecutar
+## How to run
 
 ```bash
 npm install
-npm run build:wasm    # Compila AssemblyScript → .wasm
-npm run start         # Ejecuta el demo con ts-node
-# o todo junto:
+npm run build:wasm    # Compile AssemblyScript → .wasm
+npm run start         # Run the demo with ts-node
+# or all together:
 npm run demo
 ```
 
-## Concepto clave: memoria lineal
+## Key concept: linear memory
 
-La función `sumaArray` demuestra el acceso a memoria lineal compartida entre JS y WASM:
+The `sumaArray` function demonstrates access to linear memory shared between JS and WASM:
 
 ```typescript
-// JS escribe datos en la memoria del módulo WASM
-const memoria = new Int32Array(wasm.memory.buffer);
-memoria.set(datos, 0);
-// WASM lee directamente desde esa memoria (cero copias)
-const suma = wasm.sumaArray(0, datos.length);
+// JS writes data into the WASM module memory
+const memory = new Int32Array(wasm.memory.buffer);
+memory.set(data, 0);
+// WASM reads directly from that memory (zero copies)
+const sum = wasm.sumaArray(0, data.length);
 ```
