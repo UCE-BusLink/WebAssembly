@@ -1,9 +1,9 @@
 // ============================================================
 // WebAssembly Demo - AssemblyScript Module
-// Funciones compiladas a .wasm para máximo rendimiento
+// Functions compiled to .wasm for maximum performance
 // ============================================================
 
-// 1. Factorial iterativo (sin recursión para evitar stack overflow)
+// 1. Iterative factorial (without recursion to avoid stack overflow)
 export function factorial(n: i32): i64 {
   let result: i64 = 1;
   for (let i: i32 = 2; i <= n; i++) {
@@ -12,7 +12,7 @@ export function factorial(n: i32): i64 {
   return result;
 }
 
-// 2. Fibonacci con memoization en memoria lineal WASM
+// 2. Fibonacci with memoization in WASM linear memory
 export function fibonacci(n: i32): i64 {
   if (n <= 1) return n as i64;
   let a: i64 = 0;
@@ -25,8 +25,8 @@ export function fibonacci(n: i32): i64 {
   return b;
 }
 
-// 3. Verificador de número primo (O(√n))
-export function esPrimo(n: i32): bool {
+// 3. Prime number checker (O(√n))
+export function isPrime(n: i32): bool {
   if (n < 2) return false;
   if (n === 2) return true;
   if (n % 2 === 0) return false;
@@ -38,10 +38,10 @@ export function esPrimo(n: i32): bool {
   return true;
 }
 
-// 4. Suma de array en memoria lineal WASM
-//    ptr = puntero al inicio del array de i32 en memoria lineal
-//    len = cantidad de elementos
-export function sumaArray(ptr: i32, len: i32): i64 {
+// 4. Sum of array in linear memory WASM
+//    ptr = pointer to the beginning of the i32 array in linear memory
+//    len = number of elements
+export function sumArray(ptr: i32, len: i32): i64 {
   let total: i64 = 0;
   for (let i: i32 = 0; i < len; i++) {
     total += load<i32>(ptr + i * 4) as i64;
@@ -49,11 +49,11 @@ export function sumaArray(ptr: i32, len: i32): i64 {
   return total;
 }
 
-// 5. Potencia entera (base^exp)
-export function potencia(base: i64, exp: i32): i64 {
-  let resultado: i64 = 1;
+// 5. Integer power (base^exp)
+export function power(base: i64, exp: i32): i64 {
+  let result: i64 = 1;
   for (let i: i32 = 0; i < exp; i++) {
-    resultado *= base;
+    result *= base;
   }
-  return resultado;
+  return result;
 }

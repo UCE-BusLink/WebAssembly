@@ -3,13 +3,13 @@ import * as fs from "fs";
 interface WasmExports {
   factorial: (n: number) => bigint;
   fibonacci: (n: number) => bigint;
-  esPrimo:   (n: number) => number;
-  sumaArray: (ptr: number, len: number) => bigint;
-  potencia:  (base: bigint, exp: number) => bigint;
+  isPrime:   (n: number) => number;
+  sumArray: (ptr: number, len: number) => bigint;
+  power:  (base: bigint, exp: number) => bigint;
   memory:    WebAssembly.Memory;
 }
 
-async function cargarWasm(): Promise<WasmExports> {
+async function loadWasm(): Promise<WasmExports> {
   const wasmPath = new URL("../build/release.wasm", import.meta.url).pathname;
   const bytes    = fs.readFileSync(wasmPath);
   const { instance } = await WebAssembly.instantiate(bytes, {
@@ -40,8 +40,8 @@ async function main(): Promise<void> {
   console.log("     WebAssembly Demo - TypeScript / Node     ");
   console.log("==============================================\n");
 
-  const wasm = await cargarWasm();
-  console.log("[>>] Modulo .wasm cargado e instanciado correctamente\n");
+  const wasm = await loadWasm();
+  console.log("[>>] Module .wasm loaded and instantiated successfully\n");
 
   // 1. Factorial
   console.log("-- 1. Factorial --");
@@ -54,36 +54,36 @@ async function main(): Promise<void> {
   bench("fibonacci(80)", () => wasm.fibonacci(80));
 
   // 3. Primos
-  console.log("\n-- 3. Verificacion de primos --");
+  console.log("\n-- 3. Prime verification --");
   for (const n of [7919, 104729, 1000003, 999983]) {
-    bench(`esPrimo(${n})`, () => wasm.esPrimo(n) ? "PRIMO" : "no primo");
+    bench(`isPrime(${n})`, () => wasm.isPrime(n) ? "PRIME" : "no prime");
   }
 
-  // 4. Suma de array via memoria lineal WASM
-  console.log("\n-- 4. Suma de array (memoria lineal WASM) --");
+  // 4. Array summation via linear memory WASM
+  console.log("\n-- 4. Array sum (linear memory WASM) --");
   const N = 50_000;
   const datos = Int32Array.from({ length: N }, (_, i) => i + 1);
 
-  // Escribir datos directamente en la memoria del modulo WASM
+  // Write data directly to the WASM module memory
   const memView = new Int32Array(wasm.memory.buffer);
-  memView.set(datos, 0); // offset 0, sin colision con heap de AssemblyScript
+  memView.set(data, 0); // offset 0, no collision with AssemblyScript heap
 
-  bench(`sumaArray WASM (${N.toLocaleString()} elementos)`, () => wasm.sumaArray(0, N));
+  bench(`sumArray WASM (${N.toLocaleString()} elements)`, () => wasm.sumArray(0, N));
 
-  // Mismo calculo en JS puro para comparar
+  // Same calculation in pure JS for comparison
   const t0 = performance.now();
-  let sumaJS = 0n;
-  for (let i = 0; i < N; i++) sumaJS += BigInt(datos[i]);
+  let sumJS = 0n;
+  for (let i = 0; i < N; i++) sumJS += BigInt(data[i]);
   const t1 = performance.now();
-  console.log(`  [JS] sumaArray JS puro:      ${sumaJS}  (${(t1 - t0).toFixed(4)} ms)`);
+  console.log(`  [JS] sumArray JS pure:      ${sumJS}  (${(t1 - t0).toFixed(4)} ms)`);
 
-  // 5. Potencia
-  console.log("\n-- 5. Potencia --");
-  bench("potencia(2n, 62)", () => wasm.potencia(2n, 62));
+  // 5. Power
+  console.log("\n-- 5. Power --");
+  bench("power(2n, 62)", () => wasm.power(2n, 62));
 
   // Benchmark: WASM vs JS puro
   console.log("\n==============================================");
-  console.log("  Benchmark: WASM vs JS puro (factorial x1M)");
+  console.log("  Benchmark: WASM vs JS pure (factorial x1M)");
   console.log("==============================================");
 
   const M = 18;
@@ -101,10 +101,10 @@ async function main(): Promise<void> {
   const wasmMs = (t5 - t4).toFixed(2);
   const ratio  = ((t3 - t2) / (t5 - t4)).toFixed(2);
 
-  console.log(`\n  factorial(${M}) x ${ITER.toLocaleString()} iteraciones:`);
+  console.log(`\n  factorial(${M}) x ${ITER.toLocaleString()} iterations:`);
   console.log(`  JavaScript : ${jsMs} ms`);
   console.log(`  WebAssembly: ${wasmMs} ms`);
-  console.log(`  -> WASM fue ${ratio}x ${Number(ratio) >= 1 ? "mas rapido que JS" : "similar (overhead de llamada domina)"}\n`);
+  console.log(`  -> WASM was ${ratio}x ${Number(ratio) >= 1 ? "faster than JS" : "similar (overhead of call dominates)"}\n`);
 }
 
 main().catch(console.error);
